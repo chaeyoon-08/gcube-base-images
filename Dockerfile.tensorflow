@@ -1,0 +1,23 @@
+FROM nvcr.io/nvidia/tensorflow:25.02-tf2-py3 AS donor
+
+RUN pip uninstall -y horovod tensorrt nvidia-dali-cuda120 nvidia-dali-tf-plugin-cuda120 2>/dev/null; \
+    rm -rf /usr/local/lib/python3.12/dist-packages/horovod* \
+           /usr/local/lib/python3.12/dist-packages/tensorrt* \
+           /usr/local/lib/python3.12/dist-packages/nvidia/dali* \
+           /opt/tensorflow \
+           /workspace/nvidia-examples 2>/dev/null; true
+
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+COPY --from=donor /usr/local/lib/python3.12/dist-packages /usr/local/lib/python3.12/dist-packages
+COPY --from=donor /usr/lib/x86_64-linux-gnu/libnccl.so.2* /usr/lib/x86_64-linux-gnu/
+COPY --from=donor /usr/local/bin /usr/local/bin
+
+RUN pip install --no-cache-dir "numpy<2" && \
+    pip install --no-cache-dir "nvidia-cuda-nvcc-cu12==12.8.*"
+
+EXPOSE 8888
+CMD ["sleep", "infinity"]
