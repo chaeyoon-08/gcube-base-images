@@ -1,74 +1,66 @@
 # gcube-base-images
 
-gcube GPU 플랫폼용 베이스 이미지. 공식 이미지에 공통 설정(git 구성, 작업 디렉터리, 캐시 경로)을 더한 토대 이미지로, 상위 응용 이미지가 이를 기반으로 빌드됩니다.
+gcube GPU 플랫폼용 베이스 이미지 모음입니다. 공식 이미지(`pytorch/pytorch`, `nvidia/cuda`, NGC TensorFlow)에 gcube 공통 설정만 얹은 것으로, 그 위에 실습 환경을 쌓는 토대로 사용합니다.
 
-## 이미지 계열
+## 계열
 
-| 계열 | 이미지 | 기반 | 구성 |
-|---|---|---|---|
-| Ubuntu | `gcube-ubuntu<ubuntu>-cuda<cuda>` | `nvidia/cuda` | CUDA, Python |
-| PyTorch | `gcube-pytorch-<torch>-cuda<cuda>` | `pytorch/pytorch` | PyTorch, CUDA, cuDNN, Python |
-| TensorFlow | `gcube-tensorflow-<tf>-cuda<cuda>` | `gcube-ubuntu` | TensorFlow (NGC), CUDA, Python |
+### PyTorch — `gcube-pytorch-<torch>-cuda<cuda>`
 
-```
-ghcr.io/<owner>/gcube-ubuntu24.04-cuda12.8:runtime
-ghcr.io/<owner>/gcube-pytorch-2.11-cuda12.8:runtime
-ghcr.io/<owner>/gcube-tensorflow-2.17-cuda12.8:runtime
-```
+공식 `pytorch/pytorch` 이미지 기반. PyTorch·CUDA·cuDNN·Python이 포함됩니다.
 
-## 라인업
+| PyTorch \ CUDA | 12.6 | 12.8 | 13.0 |
+|---|:---:|:---:|:---:|
+| 2.8 | O | O | — |
+| 2.9 | O | O | O |
+| 2.10 | O | O | O |
+| 2.11 | O | O | O |
 
-### Ubuntu
-CUDA(12.6 / 12.8 / 13.0) × Ubuntu(22.04 / 24.04) × (runtime / devel), 총 12개.
-프레임워크가 포함되지 않은 토대 이미지입니다.
+각 이미지마다 `:runtime` / `:devel` 두 태그 제공 (11이미지 × 2 = 22개)
 
-### PyTorch
-PyTorch(2.8 / 2.9 / 2.10 / 2.11) × CUDA(12.6 / 12.8 / 13.0) × (runtime / devel), 총 22개.
-(PyTorch 2.8 + CUDA 13.0 조합은 제공되지 않습니다.)
+### Ubuntu+CUDA — `gcube-ubuntu<ubuntu>-cuda<cuda>`
 
-### TensorFlow
-`gcube-tensorflow-2.17-cuda12.8:runtime` (NGC 25.02 기반), 1개.
-RTX 50 시리즈(Blackwell, sm_120) 지원을 위해 NVIDIA NGC 컨테이너의 TensorFlow 런타임을 사용합니다.
+공식 `nvidia/cuda` 이미지 기반. CUDA만 포함하며 프레임워크는 없는 깡통 환경입니다.
 
-## 공통 구성
+| Ubuntu \ CUDA | 12.6 | 12.8 | 13.0 |
+|---|:---:|:---:|:---:|
+| 22.04 | O | O | O |
+| 24.04 | O | O | O |
 
-- 시스템 유틸리티: `git`, `curl`, `wget`, `vim`, `tmux`, `htop`, `ca-certificates`
-- 작업 디렉터리: `/workspace`
-- 캐시 경로: `HF_HOME`, `PIP_CACHE_DIR`
-- entrypoint: 환경변수 기반 git 구성 및 작업 저장소 자동 clone
+각 이미지마다 `:runtime` / `:devel` 두 태그 제공 (6이미지 × 2 = 12개)
 
-## 환경변수
+### TensorFlow — `gcube-tensorflow-<tf>-cuda<cuda>`
 
-모든 환경변수는 선택 사항이며, 미지정 시 해당 단계를 건너뜁니다.
+공식 TensorFlow가 Blackwell(sm_120)을 미지원하여 NGC(`nvcr.io/nvidia/tensorflow:25.02-tf2-py3`)에서 추출한 이미지입니다.
 
-| 변수 | 기본값 | 설명 |
+| TensorFlow | CUDA | 태그 |
 |---|---|---|
-| `GIT_USER_NAME` | — | 커밋 작성자 이름 |
-| `GIT_USER_EMAIL` | — | 커밋 작성자 이메일 |
-| `GIT_TOKEN` | — | 개인 액세스 토큰 (비공개 저장소 인증) |
-| `GIT_HOST` | `github.com` | git 호스트 |
-| `GIT_CLONE_REPO` | — | 컨테이너 시작 시 `/workspace`에 자동 clone할 저장소 URL |
+| 2.17 | 12.8 | `:runtime` |
 
-`GIT_TOKEN`은 최소 권한과 짧은 만료 기간을 가진 전용 토큰 사용을 권장합니다.
+## 공통 설정
 
-## 빌드
+모든 이미지에 포함된 공통 구성입니다.
 
-GitHub Actions의 수동 실행(workflow_dispatch)으로 빌드하며, 계열·버전을 선택할 수 있습니다. ghcr.io와 Docker Hub에 동시 푸시됩니다.
+- 시스템 유틸: `git`, `curl`, `wget`, `vim`, `tmux`, `htop`
+- 작업 디렉터리: `/workspace`
+- 캐시 경로: `HF_HOME=/workspace/.cache/huggingface`, `PIP_CACHE_DIR=/workspace/.cache/pip`
+- git 자동 설정 (환경변수로 제어, 전부 선택)
 
-TensorFlow 계열은 `gcube-ubuntu24.04-cuda12.8:runtime`을 기반으로 하므로, 해당 Ubuntu 이미지를 먼저 빌드해야 합니다.
+| 환경변수 | 설명 |
+|---|---|
+| `GIT_USER_NAME` | 커밋 작성자 이름 |
+| `GIT_USER_EMAIL` | 커밋 작성자 이메일 |
+| `GIT_TOKEN` | PAT. private repo 인증용 |
+| `GIT_HOST` | git 호스트 (기본값 `github.com`) |
+| `GIT_CLONE_REPO` | 워크로드 시작 시 `/workspace`에 자동 clone할 저장소 URL |
 
-사전 설정:
-- 저장소 Settings → Actions → Workflow permissions: "Read and write"
-- Secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`
-
-## 구성 파일
+## 이미지 주소
 
 ```
-gcube-base-images/
-├─ Dockerfile.ubuntu
-├─ Dockerfile.pytorch
-├─ Dockerfile.tensorflow
-├─ entrypoint.sh
-├─ README.md
-└─ .github/workflows/build.yml
+# GitHub Container Registry
+ghcr.io/chaeyoon-08/<이미지명>:<태그>
+
+# Docker Hub
+chaeyoon08/<이미지명>:<태그>
 ```
+
+두 레지스트리에 동일한 이미지가 제공됩니다.
