@@ -98,9 +98,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
-          df -h /
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Set lowercase owner
         run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
         env:
@@ -144,9 +150,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
-          df -h /
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Set lowercase owner
         run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
         env:
@@ -177,7 +189,7 @@ jobs:
           push: true
 
   tensorflow:
-    needs: setup
+    needs: [setup, ubuntu]
     if: needs.setup.outputs.tensorflow != '[]'
     runs-on: ubuntu-latest
     permissions:
@@ -190,9 +202,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
-          df -h /
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Set lowercase owner
         run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
         env:
