@@ -1,12 +1,12 @@
 # gcube-base-images
 
-gcube GPU 플랫폼용 베이스 이미지 모음입니다. 공식 이미지(`pytorch/pytorch`, `nvidia/cuda`, NGC TensorFlow)에 gcube 공통 설정만 얹은 것으로, 그 위에 실습 환경을 쌓는 토대로 사용합니다.
+gcube GPU 플랫폼용 기본 이미지 모음입니다. PyTorch·TensorFlow·CUDA 등 공식 환경에 gcube 공통 설정만 얹어, 실습 환경의 출발점으로 사용합니다.
 
-## 계열
+## 이미지 라인업
 
 ### PyTorch — `gcube-pytorch-<torch>-cuda<cuda>`
 
-공식 `pytorch/pytorch` 이미지 기반. PyTorch·CUDA·cuDNN·Python이 포함됩니다.
+PyTorch·CUDA·cuDNN·Python이 포함되어 있습니다.
 
 | PyTorch \ CUDA | 12.6 | 12.8 | 13.0 |
 |---|:---:|:---:|:---:|
@@ -15,52 +15,59 @@ gcube GPU 플랫폼용 베이스 이미지 모음입니다. 공식 이미지(`py
 | 2.10 | O | O | O |
 | 2.11 | O | O | O |
 
-각 이미지마다 `:runtime` / `:devel` 두 태그 제공 (11이미지 × 2 = 22개)
+각 이미지마다 `:runtime` / `:devel` 두 태그 제공.
 
 ### Ubuntu+CUDA — `gcube-ubuntu<ubuntu>-cuda<cuda>`
 
-공식 `nvidia/cuda` 이미지 기반. CUDA만 포함하며 프레임워크는 없는 깡통 환경입니다.
+CUDA만 포함되어 있어, 사용자가 원하는 프레임워크를 직접 설치하는 환경입니다.
 
 | Ubuntu \ CUDA | 12.6 | 12.8 | 13.0 |
 |---|:---:|:---:|:---:|
 | 22.04 | O | O | O |
 | 24.04 | O | O | O |
 
-각 이미지마다 `:runtime` / `:devel` 두 태그 제공 (6이미지 × 2 = 12개)
+각 이미지마다 `:runtime` / `:devel` 두 태그 제공.
 
 ### TensorFlow — `gcube-tensorflow-<tf>-cuda<cuda>`
 
-공식 TensorFlow가 Blackwell(sm_120)을 미지원하여 NGC(`nvcr.io/nvidia/tensorflow:25.02-tf2-py3`)에서 추출한 이미지입니다.
+TensorFlow·CUDA·cuDNN·Python이 포함되어 있습니다.
 
 | TensorFlow | CUDA | 태그 |
 |---|---|---|
 | 2.17 | 12.8 | `:runtime` |
 
-## 공통 설정
+## 사용
 
-모든 이미지에 포함된 공통 구성입니다.
+gcube 워크로드에서 직접 사용하거나, 자체 Docker 이미지를 빌드할 때 `FROM`으로 사용합니다.
+
+```
+# PyTorch
+ghcr.io/data-alliance/gcube-pytorch-2.11-cuda13.0:runtime
+chaeyoon08/gcube-pytorch-2.11-cuda13.0:runtime
+
+# Ubuntu+CUDA
+ghcr.io/data-alliance/gcube-ubuntu24.04-cuda13.0:runtime
+chaeyoon08/gcube-ubuntu24.04-cuda13.0:runtime
+
+# TensorFlow
+ghcr.io/data-alliance/gcube-tensorflow-2.17-cuda12.8:runtime
+chaeyoon08/gcube-tensorflow-2.17-cuda12.8:runtime
+```
+
+## 공통 설정
 
 - 시스템 유틸: `git`, `curl`, `wget`, `vim`, `tmux`, `htop`
 - 작업 디렉터리: `/workspace`
 - 캐시 경로: `HF_HOME=/workspace/.cache/huggingface`, `PIP_CACHE_DIR=/workspace/.cache/pip`
-- git 자동 설정 (환경변수로 제어, 전부 선택)
 
-| 환경변수 | 설명 |
-|---|---|
-| `GIT_USER_NAME` | 커밋 작성자 이름 |
-| `GIT_USER_EMAIL` | 커밋 작성자 이메일 |
-| `GIT_TOKEN` | PAT. private repo 인증용 |
-| `GIT_HOST` | git 호스트 (기본값 `github.com`) |
-| `GIT_CLONE_REPO` | 워크로드 시작 시 `/workspace`에 자동 clone할 저장소 URL |
+## 환경변수
 
-## 이미지 주소
+모든 환경변수는 선택 사항입니다. 비공개 저장소를 사용하거나 커밋 작성자를 지정하려는 경우에만 입력합니다.
 
-```
-# GitHub Container Registry
-ghcr.io/<owner>/<이미지명>:<태그>
-
-# Docker Hub
-<owner>/<이미지명>:<태그>
-```
-
-두 레지스트리에 동일한 이미지가 제공됩니다.
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `GIT_CLONE_REPO` | (없음) | 워크로드 시작 시 `/workspace`에 자동 clone할 저장소 URL |
+| `GIT_USER_NAME` | (없음) | git 커밋 작성자 이름 |
+| `GIT_USER_EMAIL` | (없음) | git 커밋 작성자 이메일 |
+| `GIT_TOKEN` | (없음) | git 인증 토큰(PAT). private 저장소 clone/push 시 필요 |
+| `GIT_HOST` | `github.com` | git 호스트. GitLab(`gitlab.com`) 또는 사내 git 서버 주소도 가능 |
