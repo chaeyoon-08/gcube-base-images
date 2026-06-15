@@ -57,10 +57,10 @@ gcube GPU 플랫폼용 베이스 이미지 모음입니다. 공식 이미지(`py
 
 ```
 # GitHub Container Registry
-ghcr.io/chaeyoon-08/<이미지명>:<태그>
+ghcr.io/<owner>/<이미지명>:<태그>
 
 # Docker Hub
-chaeyoon08/<이미지명>:<태그>
+<owner>/<이미지명>:<태그>
 ```
 
 두 레지스트리에 동일한 이미지가 제공됩니다.

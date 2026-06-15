@@ -27,7 +27,7 @@ on:
 env:
   REGISTRY: ghcr.io
   OWNER: ${{ github.repository_owner }}
-  DOCKERHUB_OWNER: chaeyoon08
+  DOCKERHUB_OWNER: ${{ secrets.DOCKERHUB_OWNER }}
 
 jobs:
   setup:
