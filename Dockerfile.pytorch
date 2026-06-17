@@ -11,7 +11,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         tmux \
         htop \
         ca-certificates \
+        fonts-nanum \
+        locales \
+    && fc-cache -f \
+    && locale-gen en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
+
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 WORKDIR /workspace
 ENV HF_HOME=/workspace/.cache/huggingface \
