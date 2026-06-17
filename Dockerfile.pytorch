@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         htop \
         ca-certificates \
         fonts-nanum \
+        fontconfig \
         locales \
     && fc-cache -f \
     && locale-gen en_US.UTF-8 \
