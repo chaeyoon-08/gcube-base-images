@@ -40,18 +40,18 @@ TensorFlow·CUDA·cuDNN·Python이 포함되어 있습니다.
 
 gcube 워크로드에서 직접 사용하거나, 자체 Docker 이미지를 빌드할 때 `FROM`으로 사용합니다.
 
+AWS ECR이 GitHub Container Registry보다 다운로드 속도가 빠르기 때문에 사용을 권장합니다. 단, 현재 AWS ECR에는 아래 3개만 제공되며, 그 외 이미지는 GitHub Container Registry에서 받을 수 있습니다.
+
 ```
-# PyTorch
+# AWS ECR (권장, 현재 3종)
+public.ecr.aws/g3x5o1w3/gcube/base/pytorch-2.11-cuda13.0:runtime
+public.ecr.aws/g3x5o1w3/gcube/base/ubuntu24.04-cuda13.0:runtime
+public.ecr.aws/g3x5o1w3/gcube/base/tensorflow-2.17-cuda12.8:runtime
+
+# GitHub Container Registry (전체)
 ghcr.io/data-alliance/gcube-pytorch-2.11-cuda13.0:runtime
-chaeyoon08/gcube-pytorch-2.11-cuda13.0:runtime
-
-# Ubuntu+CUDA
 ghcr.io/data-alliance/gcube-ubuntu24.04-cuda13.0:runtime
-chaeyoon08/gcube-ubuntu24.04-cuda13.0:runtime
-
-# TensorFlow
 ghcr.io/data-alliance/gcube-tensorflow-2.17-cuda12.8:runtime
-chaeyoon08/gcube-tensorflow-2.17-cuda12.8:runtime
 ```
 
 ## 공통 설정
